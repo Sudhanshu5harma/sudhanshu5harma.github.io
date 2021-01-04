@@ -1,5 +1,5 @@
 ---
-heading: "Hi, I'm mg"
-subheading: "A fullstack developer, working at HPE."
-handle: "mridulganga"
+heading: "Hi, I'm Sudhanshu"
+subheading: "A 5g developer, working at IITK."
+handle: "Sudhanshusharma"
 ---
