@@ -1,15 +1,15 @@
-baseURL = "http://mridulganga.github.io/"
+baseURL = "http://sudhanshu55.github.io/"
 languageCode = "en-us"
-title = "MG Blog"
+title = "Sudhanshu's Page"
 theme="codex"
-disqusShortname="mridulganga-github-io"
+disqusShortname="sudhanshu55-github-io"
 
 [params]
-  github = "https://github.com/mridulganga"
-  gitlab = "https://gitlab.com/mridulganga"
-  instagram = "https://www.instagram.com/mridulkepler"
-  linkedin = "https://www.linkedin.com/in/mridul-ganga-03326aa2"
-  telegram = "https://t.me/mridulganga"
+  #github = "https://github.com/mridulganga"
+  #gitlab = "https://gitlab.com/mridulganga"
+  #instagram = "https://www.instagram.com/mridulkepler"
+  #linkedin = "https://www.linkedin.com/in/mridul-ganga-03326aa2"
+  #telegram = "https://t.me/mridulganga"
   iconOrder = ["Gitlab", "GitHub", "Instagram", "Linkedin", "Telegram"]
   showPageTitleInTOC = true
 
@@ -26,8 +26,8 @@ disqusShortname="mridulganga-github-io"
 # Controls the navigation
 [[menu.main]]
   identifier = "about"
-  name = "@mg"
-  title = "mridulganga"
+  name = "sudhanshu"
+  title = "SudhanshuSharma"
   url = "/"
 
 [[menu.main]]
