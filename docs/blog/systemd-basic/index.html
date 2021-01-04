@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>Simple systemd on Linux | MG Blog</title>
+
+  <meta charset="UTF-8">
+  <meta name="language" content="en">
+  <meta name="description" content="A simple example for systemd">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  
+  
+
+  <link rel="shortcut icon" type="image/png" href="/favicon.ico" />
+
+  
+  
+    
+ 
+  
+  
+  
+  
+  
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/post.min.2cb93c91050d1853bf971cc31e00122edd6e0f405aa1de3b7f8ef67ea3b5a79a.css" integrity="sha256-LLk8kQUNGFO/lxzDHgASLt1uD0Baod47f472fqO1p5o="/>
+  
+    
+    <link type="text/css" rel="stylesheet" href="/css/custom.min.fdde0f86e0faf7ffd9473619448280730a1538785adc0e7b627c9499f55724bc.css" integrity="sha256-/d4PhuD69//ZRzYZRIKAcwoVOHha3A57YnyUmfVXJLw="/>
+  
+  
+   
+   
+    
+
+<script type="application/ld+json">
+  
+    {
+      "@context" : "http://schema.org",
+      "@type" : "BlogPosting",
+      "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/mridulganga.github.io\/"
+      },
+      "articleSection" : "blog",
+      "name" : "Simple systemd on Linux",
+      "headline" : "Simple systemd on Linux",
+      "description" : "A simple example for systemd",
+      "inLanguage" : "en-US",
+      "author" : "",
+      "creator" : "",
+      "publisher": "",
+      "accountablePerson" : "",
+      "copyrightHolder" : "",
+      "copyrightYear" : "2020",
+      "datePublished": "2020-09-04 20:15:23 \x2b0530 IST",
+      "dateModified" : "2020-09-04 20:15:23 \x2b0530 IST",
+      "url" : "http:\/\/mridulganga.github.io\/blog\/systemd-basic\/",
+      "wordCount" : "399",
+      "keywords" : ["Blog"]
+    }
+  
+  </script>
+</head>
+
+<body>
+  <div class="burger__container">
+  <div class="burger" aria-controls="navigation" aria-label="Menu">
+    <div class="burger__meat burger__meat--1"></div>
+    <div class="burger__meat burger__meat--2"></div>
+    <div class="burger__meat burger__meat--3"></div>
+  </div>
+</div>
+ 
+
+  <nav class="nav" id="navigation">
+  <ul class="nav__list">
+    
+    
+      <li>
+        <a  href="/">@mg</a>
+      </li>
+    
+      <li>
+        <a  class="active"
+         href="/blog">blog</a>
+      </li>
+    
+  </ul>
+</nav>
+
+
+  <main>
+    
+    
+
+    <div class="flex-wrapper">
+      <div class="post__container">
+        <div class="post">
+          <header class="post__header">
+            <h1 id="post__title">Simple systemd on Linux</h1>
+            <time datetime="2020-09-04 20:15:23 &#43;0530 IST" class="post__date">Sep 4 2020</time> 
+          </header>
+          <article class="post__content">
+              
+<p>Below is a super simple guide to creating a systemd service on linux. Systemd is not yet supported on all the linux systems, but it&rsquo;s popular and easy to use.</p>
+<h2 id="what-is-systemd">What is systemd?<a class="anchor" href="#what-is-systemd">#</a></h2>
+<p>systemd is a Linux initialization system and service manager that includes features like on-demand starting of daemons, mount and automount point maintenance, snapshot support, and processes tracking using Linux control groups.</p>
+<p>In simple terms, it helps us manage the lifecycle of services. You can add services to startup jobs, if your services die, it can auto restart and much more.</p>
+<h2 id="making-a-simple-flask-application-our-service">Making a simple flask application (our service)<a class="anchor" href="#making-a-simple-flask-application-our-service">#</a></h2>
+<p>Requirements:</p>
+<ul>
+<li>python3 installed</li>
+<li>pip3 installed</li>
+</ul>
+<p>Install flask using pip3</p>
+<pre><code class="language-bash">sudo pip3 install flask
+</code></pre>
+<h3 id="make-a-basic-flask-application">Make a basic flask application<a class="anchor" href="#make-a-basic-flask-application">#</a></h3>
+<p>Make a file <code>main.py</code>, place it in any folder ex - <code>/home/mridul/main.py</code> and add the following contents in it.</p>
+<pre><code class="language-python">from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
+
+app.run(port=8000)
+</code></pre>
+<h3 id="run-and-test-the-flask-app">Run and test the flask app<a class="anchor" href="#run-and-test-the-flask-app">#</a></h3>
+<p>To run out flask server -</p>
+<pre><code class="language-bash">/usr/bin/python3 /home/mridul/main.py
+</code></pre>
+<p>To test if our application is running -</p>
+<pre><code class="language-bash">curl http://localhost:8000
+</code></pre>
+<p>You should be able to see Hello World! in the curl output.</p>
+<h2 id="making-a-systemd-entry">Making a systemd entry<a class="anchor" href="#making-a-systemd-entry">#</a></h2>
+<p>To begin with the systemd service entry will be stored in <code>/etc/systemd/system/</code>
+So, create a new file <code>/etc/systemd/system/flaskapp.service</code></p>
+<pre><code class="language-ini">[Unit]
+Description=Simple flask app service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=mridul
+ExecStart=/usr/bin/python3 /home/mridul/main.py
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>Most of the above fields are easy to understand. The <code>After</code> field is used to start our service only after the network service runs. We can also put something else like <code>mysql.target</code> to run it after mysql service runs.</p>
+<p>In the <code>User</code> field, we need to provice which user should the service be run from, for our example we can run it from my user i.e. <code>mridul</code>.</p>
+<p>The <code>ExecStart</code> is where we give the command to run our service.</p>
+<p><code>Restart</code> is used to specify the behavior when our service dies due to some reason. setting it to <code>always</code> will restart our service everytime it dies, even if it exited with status code <code>0</code>. To restart only in case of failure we can set it to <code>on-failure</code>.</p>
+<h2 id="basic-systemd-commands">Basic systemd commands<a class="anchor" href="#basic-systemd-commands">#</a></h2>
+<p>To start our service</p>
+<pre><code class="language-bash">sudo systemctl start flaskapp
+</code></pre>
+<p>To stop our service</p>
+<pre><code class="language-bash">sudo systemctl stop flaskapp
+</code></pre>
+<p>To restart our service</p>
+<pre><code class="language-bash">sudo systemctl restart flaskapp
+</code></pre>
+<p>To check status of our service</p>
+<pre><code class="language-bash">sudo systemctl status flaskapp
+</code></pre>
+<p>To start our service during system startup</p>
+<pre><code class="language-bash">sudo systemctl enable flaskapp
+</code></pre>
+
+
+              
+          </article>
+          
+
+<ul class="tags__list">
+    
+    <li class="tag__item">
+        <a class="tag__link" href="http://mridulganga.github.io/tags/tech/">tech</a>
+    </li>
+    <li class="tag__item">
+        <a class="tag__link" href="http://mridulganga.github.io/tags/systemd/">systemd</a>
+    </li>
+    <li class="tag__item">
+        <a class="tag__link" href="http://mridulganga.github.io/tags/flask/">flask</a>
+    </li></ul>
+
+ <div class="pagination">
+  
+    <a class="pagination__item" href="http://mridulganga.github.io/blog/no-gravity/">
+        <span class="pagination__label">Previous Post</span>
+        <span class="pagination__title">What if there was no Gravity?</span>
+    </a>
+  
+
+  
+    <a class="pagination__item" href="http://mridulganga.github.io/blog/temporal-paradoxes/">
+      <span class="pagination__label">Next Post</span>
+      <span class="pagination__title" >Most popular Temporal Paradoxes</a>
+    </a>
+  
+</div>
+
+          <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "mridulganga-github-io" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+          <footer class="post__footer">
+            
+
+
+<div class="social-icons">
+  
+     
+    
+      <a class="social-icons__link" title="Gitlab"
+         href="https://gitlab.com/mridulganga"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('http://mridulganga.github.io/svg/gitlab.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" title="GitHub"
+         href="https://github.com/mridulganga"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('http://mridulganga.github.io/svg/github.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" title="Instagram"
+         href="https://www.instagram.com/mridulkepler"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('http://mridulganga.github.io/svg/instagram.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" title="Linkedin"
+         href="https://www.linkedin.com/in/mridul-ganga-03326aa2"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('http://mridulganga.github.io/svg/linkedin.svg')"></div>
+      </a>
+    
+  
+     
+    
+      <a class="social-icons__link" title="Telegram"
+         href="https://t.me/mridulganga"
+         target="_blank" rel="noopener">
+        <div class="social-icons__icon" style="background-image: url('http://mridulganga.github.io/svg/telegram.svg')"></div>
+      </a>
+    
+     
+</div>
+
+            <p></p>
+          </footer>
+          </div>
+      </div>
+      
+    </div>
+    
+
+  </main>
+
+   
+
+  
+  <script src="/js/index.min.49e4d8a384357d9b445b87371863419937ede9fa77737522ffb633073aebfa44.js" integrity="sha256-SeTYo4Q1fZtEW4c3GGNBmTft6fp3c3Ui/7YzBzrr&#43;kQ=" crossorigin="anonymous"></script>
+  
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/components/prism-core.min.js"></script>
+
+  
+  <script src="https://unpkg.com/prismjs@1.20.0/plugins/autoloader/prism-autoloader.min.js"
+    data-autoloader-path="https://unpkg.com/prismjs@1.20.0/components/"></script>
+
+  
+
+
+</body>
+
+</html>
