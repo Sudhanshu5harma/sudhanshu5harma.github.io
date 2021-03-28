@@ -1,11 +1,14 @@
-menu
-    Home                [index.html]
-    Research			[research.html]
-	Publication         [publications.html]
-	Teaching			[teaching.html]
+General
+    About me            [index.html]
+    Awards 				[awards.html]
+Industry
+    Employement 		[employement.html]
+Academia
+    Research            [research.html]
+    Project 			[projects.html]
 	Courses				[courses.html]
-    Activities			[activities.html]
+
 	
-usefull links
-   Jemdoc   		[http://jemdoc.jaboc.net/]
+Blog
+   Links    		  [blog.html]
    
